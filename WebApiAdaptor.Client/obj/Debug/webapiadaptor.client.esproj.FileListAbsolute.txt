@@ -1,0 +1,1 @@
+D:\test\test-webapi\WebApiAdaptor\webapiadaptor.client\obj\Debug\webapiadaptor.client.esproj.CoreCompileInputs.cache

@@ -27,7 +27,7 @@
 
         public static List<OrdersDetails> GetAllRecords()
         {
-            if (order.Count() == 0)
+            if (order.Count == 0)
             {
                 int code = 10000;
                 for (int i = 1; i < 10; i++)

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApiAdaptor.Server.Models;
 
-namespace WebApiAdaptor.Controllers
+namespace WebApiAdaptor.Server.Controllers
 {
 
     [Route("api/[controller]")]
@@ -16,8 +16,9 @@ namespace WebApiAdaptor.Controllers
         {
             var queryString = Request.Query;
             var data = OrdersDetails.GetAllRecords().ToList();
-            string sort = queryString["$orderby"];   // Get sorting parameter  
-            string filter = queryString["$filter"]; // // Get filtering parameter
+
+            string? sort = queryString["$orderby"];   // Get sorting parameter  
+            string? filter = queryString["$filter"]; // // Get filtering parameter
 
             //Peform sort operation
             if (!string.IsNullOrEmpty(sort))
@@ -46,7 +47,7 @@ namespace WebApiAdaptor.Controllers
                     }
                 }
 
-                data = orderedData.ToList();
+                data = [.. orderedData];
             }
             if (filter != null)
             {
@@ -63,11 +64,10 @@ namespace WebApiAdaptor.Controllers
 
                         // Apply the search value to all searchable fields
                         data = data.Where(cust =>
-                            cust.OrderID.ToString().Contains(searchValue) ||
-                            cust.CustomerID.ToLower().Contains(searchValue) ||
-                            cust.ShipCity.ToLower().Contains(searchValue)
-                        // Add conditions for other searchable fields as needed
-                        ).ToList();
+                                cust != null &&
+                                ((cust.OrderID?.ToString()?.Contains(searchValue) ?? false) ||
+                                (cust.CustomerID?.ToLower()?.Contains(searchValue) ?? false) ||
+                                (cust.ShipCity?.ToLower()?.Contains(searchValue) ?? false))).ToList();
                     }
                     else
                     {
@@ -90,21 +90,17 @@ namespace WebApiAdaptor.Controllers
                         switch (filterfield)
                         {
                             case "OrderID":
-                                data = (from cust in data
-                                        where cust.OrderID.ToString() == filtervalue.ToString()
-                                        select cust).ToList();
+                                data = data.Where(cust => cust != null && cust.OrderID?.ToString() == filtervalue.ToString()).ToList();
                                 break;
                             case "CustomerID":
-                                data = (from cust in data
-                                        where cust.CustomerID.ToLower().StartsWith(filtervalue.ToString())
-                                        select cust).ToList();
+                                data = data.Where(cust => cust != null && cust.CustomerID?.ToLower().StartsWith(filtervalue.ToString()) == true).ToList();
                                 break;
                             case "ShipCity":
-                                data = (from cust in data
-                                        where cust.ShipCity.ToLower().StartsWith(filtervalue.ToString())
-                                        select cust).ToList();
+                                data = data.Where(cust => cust != null && cust.ShipCity?.ToLower().StartsWith(filtervalue.ToString()) == true).ToList();
                                 break;
+                                // Add more cases for other searchable fields if needed
                         }
+
                     }
                 }
             }
@@ -112,24 +108,18 @@ namespace WebApiAdaptor.Controllers
 
             int skip = Convert.ToInt32(queryString["$skip"]);
             int take = Convert.ToInt32(queryString["$top"]);
+            int TotalRecordsCount = data.Count;
 
-            return take != 0 ? new { Items = data.Skip(skip).Take(take).ToList(), Count = data.Count() } : new { Items = data, Count = data.Count() };
+            return take != 0 ? new { Items = data.Skip(skip).Take(take).ToList(), Count = TotalRecordsCount } : new { Items = data, Count = TotalRecordsCount };
         }
 
-
-        // GET: api/Orders/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
 
         // POST: api/Orders
         [HttpPost]
         /// <summary>
         /// Inserts a new data item into the data collection.
         /// </summary>
-        /// <param name="value<T>">It holds new record detail which is need to be inserted.</param>
+        /// <param name="value">It holds new record detail which is need to be inserted.</param>
         /// <returns>Returns void</returns>
         public void Post([FromBody] OrdersDetails newRecord)
         {
@@ -142,7 +132,7 @@ namespace WebApiAdaptor.Controllers
         /// <summary>
         /// Update a existing data item from the data collection.
         /// </summary>
-        /// <param name="">It holds updated record detail which is need to be updated.</param>
+        /// <param name="order">It holds updated record detail which is need to be updated.</param>
         /// <returns>Returns void</returns>
         public void Put(int id, [FromBody] OrdersDetails order)
         {
@@ -157,7 +147,7 @@ namespace WebApiAdaptor.Controllers
             }
         }
 
-        // DELETE: api/5
+        // DELETE: api/Orders/5
         [HttpDelete("{id}")]
         /// <summary>
         /// Remove a specific data item from the data collection.
