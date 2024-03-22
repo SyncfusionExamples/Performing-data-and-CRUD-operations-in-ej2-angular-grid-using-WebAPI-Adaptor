@@ -15,7 +15,7 @@ export class AppComponent {
 
   ngOnInit(): void {
     this.data = new DataManager({
-      url: 'https://localhost:7112/api/Orders',
+      url: 'https://localhost:7041/api/Orders',
       adaptor: new WebApiAdaptor()
     });
 

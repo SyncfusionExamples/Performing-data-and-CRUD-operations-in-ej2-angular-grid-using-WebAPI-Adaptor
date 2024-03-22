@@ -15,7 +15,7 @@ import { EditService, FilterService, GridModule, PageService, SortService, Toolb
     AppRoutingModule,
     GridModule
   ],
-  providers: [EditService, ToolbarService, FilterService, SortService, PageService],
+  providers: [EditService, ToolbarService, SortService, FilterService, PageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
