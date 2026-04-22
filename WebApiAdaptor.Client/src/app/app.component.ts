@@ -16,7 +16,8 @@ export class AppComponent {
   ngOnInit(): void {
     this.data = new DataManager({
       url: 'https://localhost:7041/api/Orders',
-      adaptor: new WebApiAdaptor()
+      adaptor: new WebApiAdaptor(),
+      crossDomain:true
     });
 
     this.editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Normal' };
